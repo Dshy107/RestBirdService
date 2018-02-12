@@ -12,36 +12,63 @@ namespace BirdObservationRESTService
     [ServiceContract]
     public interface IService1
     {
+        // TODO birds by id, birds by userID, birds by nameFragment
 
         [OperationContract]
-        string GetData(int value);
+        [WebInvoke(Method = "GET", ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "birds")]
+        List<Bird> GetBirds();
 
         [OperationContract]
-        CompositeType GetDataUsingDataContract(CompositeType composite);
+        [WebInvoke(Method = "GET", ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "observations")]
+        // TODO ?userId, order By date, birds name
+        List<BirdObservation> GetObservations();
 
-        // TODO: Add your service operations here
+
     }
 
 
-    // Use a data contract as illustrated in the sample below to add composite types to service operations.
     [DataContract]
-    public class CompositeType
+    public class Bird
     {
-        bool boolValue = true;
-        string stringValue = "Hello ";
+        [DataMember]
+        public int Id { get; set; }
+        [DataMember]
+        public string NameEnglish { get; set; }
+        [DataMember]
+        public string NameDanish { get; set; }
+        [DataMember]
+        public string PhotoUrl { get; set; }
+        [DataMember]
+        public string UserId { get; set; }
+        [DataMember]
+        public DateTime? Created { get; set; }
+    }
+
+    [DataContract]
+    public class BirdObservation
+    {
+        [DataMember]
+        public int Id { get; set; }
+        [DataMember]
+        public int BirdId { get; set; }
 
         [DataMember]
-        public bool BoolValue
-        {
-            get { return boolValue; }
-            set { boolValue = value; }
-        }
+        public string UserId { get; set; }
 
         [DataMember]
-        public string StringValue
-        {
-            get { return stringValue; }
-            set { stringValue = value; }
-        }
+        public DateTime? Created { get; set; }
+
+        [DataMember]
+        public double Latitude { get; set; }
+        [DataMember]
+        public double Longitude { get; set; }
+        [DataMember]
+        public string Placename { get; set; }
+        [DataMember]
+        public int Population { get; set; }
+        [DataMember]
+        public string Comment { get; set; }
     }
 }
