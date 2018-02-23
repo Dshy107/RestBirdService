@@ -64,9 +64,9 @@ namespace BirdObservationRESTService
         }
 
         // TODO should include bird name
-        public List<BirdObservation> GetObservations()
+        public List<BirdObservationFull> GetObservations()
         {
-            const string selectAllStudents = "select * from birdObservation order by id desc";
+            const string selectAllStudents = "select birdObservation.*, nameEn, nameDA from birdObservation join bird on birdobservation.birdId=bird.Id order by id desc";
             using (SqlConnection databaseConnection = new SqlConnection(ConnectionString))
             {
                 databaseConnection.Open();
@@ -74,10 +74,10 @@ namespace BirdObservationRESTService
                 {
                     using (SqlDataReader reader = selectCommand.ExecuteReader())
                     {
-                        List<BirdObservation> observationsList = new List<BirdObservation>();
+                        List<BirdObservationFull> observationsList = new List<BirdObservationFull>();
                         while (reader.Read())
                         {
-                            BirdObservation observation = ReadBirdObservation(reader);
+                            BirdObservationFull observation = ReadBirdObservation(reader);
                             observationsList.Add(observation);
                         }
                         return observationsList;
@@ -121,7 +121,7 @@ namespace BirdObservationRESTService
             }
         }
 
-        private static BirdObservation ReadBirdObservation(IDataRecord reader)
+        private static BirdObservationFull ReadBirdObservation(IDataRecord reader)
         {
             int id = reader.GetInt32(0);
             int birdId = reader.GetInt32(1);
@@ -134,8 +134,10 @@ namespace BirdObservationRESTService
             string placename = ReadSafe(reader, 6);
             int population = reader.GetInt32(7);
             string comment = ReadSafe(reader, 8);
+            string nameEN = reader.GetString(9);
+            string nameDA = reader.GetString(10);
 
-            BirdObservation birdObservation = new BirdObservation
+            BirdObservationFull birdObservation = new BirdObservationFull
             {
                 Id = id,
                 BirdId = birdId,
@@ -145,7 +147,9 @@ namespace BirdObservationRESTService
                 Longitude = longitude,
                 Placename = placename,
                 Population = population,
-                Comment = comment
+                Comment = comment,
+                NameEnglish = nameEN,
+                NameDanish = nameDA
             };
             return birdObservation;
         }

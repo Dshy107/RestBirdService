@@ -23,7 +23,7 @@ namespace BirdObservationRESTService
         [WebInvoke(Method = "GET", ResponseFormat = WebMessageFormat.Json,
             UriTemplate = "observations")]
         // TODO ?userId, order By date, birds name
-        List<BirdObservation> GetObservations();
+        List<BirdObservationFull> GetObservations();
 
         [OperationContract]
         [WebInvoke(Method = "POST", RequestFormat = WebMessageFormat.Json,
@@ -74,5 +74,14 @@ namespace BirdObservationRESTService
         public int Population { get; set; }
         [DataMember]
         public string Comment { get; set; }
+    }
+
+    [DataContract]
+    public class BirdObservationFull : BirdObservation
+    {
+        [DataMember]
+        public string NameEnglish { get; set; }
+        [DataMember]
+        public string NameDanish { get; set; }
     }
 }
