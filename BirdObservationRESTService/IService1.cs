@@ -25,7 +25,11 @@ namespace BirdObservationRESTService
         // TODO ?userId, order By date, birds name
         List<BirdObservation> GetObservations();
 
-
+        [OperationContract]
+        [WebInvoke(Method = "POST", RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "observations")]
+        int AddObservation(BirdObservation obseration);
     }
 
 

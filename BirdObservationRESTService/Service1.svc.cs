@@ -63,9 +63,10 @@ namespace BirdObservationRESTService
             return reader.IsDBNull(index) ? null : reader.GetString(index);
         }
 
+        // TODO should include bird name
         public List<BirdObservation> GetObservations()
         {
-            const string selectAllStudents = "select * from birdObservation order by id";
+            const string selectAllStudents = "select * from birdObservation order by id desc";
             using (SqlConnection databaseConnection = new SqlConnection(ConnectionString))
             {
                 databaseConnection.Open();
@@ -82,6 +83,41 @@ namespace BirdObservationRESTService
                         return observationsList;
                     }
                 }
+            }
+        }
+
+        public int AddObservation(BirdObservation observation)
+        {
+            const string insertStudent = "insert into birdObservation (birdId, userId, latitude, longitude, placeName, population, comment) values (@birdId, @userId, @latitude, @longitude, @placeName, @population, @comment)";
+            using (SqlConnection databaseConnection = new SqlConnection(ConnectionString))
+            {
+                databaseConnection.Open();
+                using (SqlCommand insertCommand = new SqlCommand(insertStudent, databaseConnection))
+                {
+                    insertCommand.Parameters.AddWithValue("@birdId", observation.BirdId);
+                    insertCommand.Parameters.AddWithValue("@userId", observation.UserId);
+                    //insertCommand.Parameters.AddWithValue("@created", observation.Created);
+                    insertCommand.Parameters.AddWithValue("@latitude", observation.Latitude);
+                    insertCommand.Parameters.AddWithValue("@longitude", observation.Longitude);
+                    SetParameter("placeName", observation.Placename, insertCommand);
+                    insertCommand.Parameters.AddWithValue("@population", observation.Population);
+                    SetParameter("comment", observation.Comment, insertCommand);
+                    int rowsAffected = insertCommand.ExecuteNonQuery();
+                    // TODO return new ID, or new object
+                    return rowsAffected;
+                }
+            }
+        }
+
+        private static void SetParameter(string name, string value, SqlCommand insertCommand)
+        {
+            if (value == null)
+            {
+                insertCommand.Parameters.AddWithValue(name, DBNull.Value);
+            }
+            else
+            {
+                insertCommand.Parameters.AddWithValue(name, value);
             }
         }
 
