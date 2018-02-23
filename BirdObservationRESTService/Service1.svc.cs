@@ -88,7 +88,8 @@ namespace BirdObservationRESTService
 
         public int AddObservation(BirdObservation observation)
         {
-            const string insertStudent = "insert into birdObservation (birdId, userId, latitude, longitude, placeName, population, comment) values (@birdId, @userId, @latitude, @longitude, @placeName, @population, @comment)";
+            // TODO use date from user
+            const string insertStudent = "insert into birdObservation (birdId, userId, latitude, longitude, placeName, population, comment, created) values (@birdId, @userId, @latitude, @longitude, @placeName, @population, @comment, @created)";
             using (SqlConnection databaseConnection = new SqlConnection(ConnectionString))
             {
                 databaseConnection.Open();
@@ -97,6 +98,16 @@ namespace BirdObservationRESTService
                     insertCommand.Parameters.AddWithValue("@birdId", observation.BirdId);
                     insertCommand.Parameters.AddWithValue("@userId", observation.UserId);
                     //insertCommand.Parameters.AddWithValue("@created", observation.Created);
+                    DateTime? da = observation.Created;
+                    if (da == null)
+                    {
+                        insertCommand.Parameters.AddWithValue("@created", DateTime.Now.Date);
+                    }
+                    else
+                    {
+                        insertCommand.Parameters.AddWithValue("@created", da);
+                    }
+
                     insertCommand.Parameters.AddWithValue("@latitude", observation.Latitude);
                     insertCommand.Parameters.AddWithValue("@longitude", observation.Longitude);
                     SetParameter("placeName", observation.Placename, insertCommand);
@@ -126,9 +137,9 @@ namespace BirdObservationRESTService
             int id = reader.GetInt32(0);
             int birdId = reader.GetInt32(1);
             string userId = ReadSafe(reader, 2);
-            DateTime? created; // DateTime is a struct (not a class)
-            if (reader.IsDBNull(3)) created = null;
-            else created = reader.GetDateTime(3);
+            DateTime? created; // DateTime is a struct (not a class). ?: does not work
+            if (reader.IsDBNull(3)) { created = null; }
+            else { created = reader.GetDateTime(3); }
             double latitude = reader.GetDouble(4);
             double longitude = reader.GetDouble(5);
             string placename = ReadSafe(reader, 6);
@@ -150,6 +161,7 @@ namespace BirdObservationRESTService
                 Comment = comment,
                 NameEnglish = nameEN,
                 NameDanish = nameDA
+
             };
             return birdObservation;
         }
