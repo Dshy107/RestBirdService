@@ -64,14 +64,29 @@ namespace BirdObservationRESTService
         }
 
         // TODO should include bird name
-        public List<BirdObservationFull> GetObservations()
+        public List<BirdObservationFull> GetObservations(string userid = null)
         {
-            const string selectAllStudents = "select birdObservation.*, nameEn, nameDA from birdObservation join bird on birdobservation.birdId=bird.Id order by id desc";
+            string selectAllStudents;
+            bool useridIncluded = (userid != null && userid.Trim().Length > 0);
+            if (!useridIncluded)
+            {
+                selectAllStudents =
+                    "select birdObservation.*, nameEn, nameDA from birdObservation join bird on birdobservation.birdId=bird.Id order by id desc";
+            }
+            else
+            {
+                selectAllStudents =
+                    "select birdObservation.*, nameEn, nameDA from birdObservation join bird on birdobservation.birdId=bird.Id where birdobservation.userid = @userid order by id desc";
+            }
             using (SqlConnection databaseConnection = new SqlConnection(ConnectionString))
             {
                 databaseConnection.Open();
                 using (SqlCommand selectCommand = new SqlCommand(selectAllStudents, databaseConnection))
                 {
+                    if (useridIncluded)
+                    {
+                        selectCommand.Parameters.AddWithValue("@userid", userid);
+                    }
                     using (SqlDataReader reader = selectCommand.ExecuteReader())
                     {
                         List<BirdObservationFull> observationsList = new List<BirdObservationFull>();
@@ -130,6 +145,27 @@ namespace BirdObservationRESTService
             {
                 insertCommand.Parameters.AddWithValue(name, value);
             }
+        }
+
+        public int RemoveObservation(string id)
+        {
+            int idInt = int.Parse(id);
+            const string deleteObservation = "delete from birdObservation where id = @id";
+            using (SqlConnection databaseConnection = new SqlConnection(ConnectionString))
+            {
+                databaseConnection.Open();
+                using (SqlCommand deleteCommand = new SqlCommand(deleteObservation, databaseConnection))
+                {
+                    deleteCommand.Parameters.AddWithValue("@id", idInt);
+                    int rowsAffected = deleteCommand.ExecuteNonQuery();
+                    return rowsAffected;
+                }
+            }
+        }
+
+        public int UpdateObservation(string id, BirdObservation observation)
+        {
+            return 0;
         }
 
         private static BirdObservationFull ReadBirdObservation(IDataRecord reader)

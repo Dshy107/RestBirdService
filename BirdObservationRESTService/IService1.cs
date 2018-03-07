@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Web.Script.Services;
 
 namespace BirdObservationRESTService
 {
@@ -21,17 +22,30 @@ namespace BirdObservationRESTService
 
         [OperationContract]
         [WebInvoke(Method = "GET", ResponseFormat = WebMessageFormat.Json,
-            UriTemplate = "observations")]
+            UriTemplate = "observations?userid={userid}")]
         // TODO ?userId, order By date, birds name
-        List<BirdObservationFull> GetObservations();
+        List<BirdObservationFull> GetObservations(string userid = null);
 
         [OperationContract]
         [WebInvoke(Method = "POST", RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
             UriTemplate = "observations")]
         int AddObservation(BirdObservation obseration);
-    }
 
+        [OperationContract]
+        [WebInvoke(Method = "DELETE",
+            ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "observations/{id}")]
+        int RemoveObservation(string id);
+
+        /*   [OperationContract]
+           [WebInvoke(Method = "PUT",
+               RequestFormat = WebMessageFormat.Json,
+               ResponseFormat = WebMessageFormat.Json,
+               UriTemplate = "observations/{id}")]
+           int UpdateObservation(string id, BirdObservation observation);
+       */
+    }
 
     [DataContract]
     public class Bird
